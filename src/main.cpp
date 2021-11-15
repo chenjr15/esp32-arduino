@@ -33,8 +33,17 @@ void hdc1080Init();
 void printSerialNumber();
 void ntpInit();
 void drawUI();
+char flag = 0;
+void onKeyPress()
+{
+
+  Serial.println("Pressed!");
+  digitalWrite(LED_BUILTIN, flag);
+  flag = !flag;
+}
 void setup()
 {
+
   // put your setup code here, to run once:
   Serial.begin(115200);
   WiFi.begin(WIFI_SSID, WIFI_PWD);
@@ -46,10 +55,17 @@ void setup()
   displayInit();
   hdc1080Init();
   Serial.println("Init Done!");
+  // 设定板载led为输出模式
+  pinMode(BUILTIN_LED, OUTPUT);
+  // 设定板载按键为上拉刷入，按下的时候就是接地
+  pinMode(KEY_BUILTIN, INPUT_PULLUP);
+  // 注册下降沿回调
+  attachInterrupt(0, onKeyPress, FALLING);
 }
 
 void loop()
 {
+
   // put your main code here, to run repeatedly:
   Serial.printf("Hello world!\n");
   sprintf(temp, "Temp : %.2f", hdc1080.readTemperature());
